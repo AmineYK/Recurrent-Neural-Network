@@ -1,5 +1,4 @@
 from textloader import  string2code, id2lettre
-import math
 import torch
 from utils import *
 from torch.utils.data import Subset
@@ -24,7 +23,12 @@ def generate(model, eos, start="", maxlen=200):
     sentence = start
     # format ( batch_size , length_seq) --> ( 1 , length_seq)
     start_emb = model.embedder(string2code(start).view(-1,1))
-    h_i , _ , c_i , _ = model.rnn(start_emb)
+
+    if isinstance(model.rnn,LSTM):
+        h_i , _ , c_i , _ = model.rnn(start_emb)
+    elif isinstance(model.rnn,GRU):
+        h_i , _  = model.rnn(start_emb)
+
     probas = model.rnn.decode(h_i,type='many-to-one').softmax(dim=1)
 
     multinomial_dist = Multinomial(1, probs=probas)
@@ -34,7 +38,10 @@ def generate(model, eos, start="", maxlen=200):
     x_i = model.embedder(string2code(sentence[-1]))
 
     for nb_cara_generated in range(maxlen+1):
-        h_i , c_i = model.rnn.one_step(x_i,h_i,c_i)
+        if isinstance(model.rnn,LSTM):
+            h_i , c_i = model.rnn.one_step(x_i,h_i,c_i)
+        elif isinstance(model.rnn,GRU):
+            h_i  = model.rnn.one_step(x_i,h_i)
         
         probas = model.rnn.decode(h_i,type='many-to-one').softmax(dim=1)
         multinomial_dist = Multinomial(1, probs=probas)
