@@ -29,8 +29,7 @@ dim_out = TAILLE_VOCA
 gru = GRU(dim_in,dim_lat,dim_out)
 embedder_gru = Embedder_RNN(TAILLE_VOCA+1,TAILLE_VOCA,gru)
 
-
-
+'''
 LEARNING_RATE = 1e-1
 EPOCHS = 20
 optimizer = torch.optim.Adam(params=embedder_gru.parameters() ,lr=LEARNING_RATE)
@@ -56,12 +55,16 @@ for epoch in tqdm(range(EPOCHS)):
         with torch.no_grad():
                 temp_loss.append(loss.item())
 
-    losses_tr.append(np.mean(temp_loss))
+    losses_tr.append(np.mean(temp_loss))'''
 
 
-sentence_generated = generate(embedder_gru,EOS_IX, start="Amine", maxlen=200)
-print(sentence_generated)
+'''sentence_generated = generate(embedder_gru,EOS_IX, start="Amine", maxlen=200)
+print(sentence_generated)'''
 
-plt.plot(range(EPOCHS) , losses_tr)
+'''plt.plot(range(EPOCHS) , losses_tr)
 plt.title("Loss LSTM")
 plt.show()
+'''
+a = generate_beam(embedder_gru,EOS_IX,6, start="That is some group of people", maxlen=200)
+
+b = generate_beam_nucleus(embedder_gru,EOS_IX,6,alpha=0.75, start="That is some group of people", maxlen=200)
