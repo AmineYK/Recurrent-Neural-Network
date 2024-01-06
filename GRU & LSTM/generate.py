@@ -1,12 +1,6 @@
-from textloader import  string2code, id2lettre
+from textloader import  string2code, id2lettre ,code2string
 import torch
-from utils import *
-from torch.utils.data import Subset
-from torch.utils.data import Dataset,DataLoader
-from textloader import pad_collate_fn
-
-
-#  TODO:  Ce fichier contient les différentes fonction de génération
+from modules import LSTM , GRU , Multinomial
 
 def generate(model, eos, start="", maxlen=200):
     """  Fonction de génération (l'embedding et le decodeur être des fonctions du rnn). Initialise le réseau avec start (ou à 0 si start est vide) et génère une séquence de longueur maximale 200 ou qui s'arrête quand eos est généré.

@@ -1,12 +1,12 @@
 
 import torch
-import torch.nn as nn
-from torch.nn import CrossEntropyLoss
-from torch.utils.data import DataLoader
-from textloader import *
-from generate import *
+from torch.utils.data import DataLoader,Subset
+from textloader import TextDataset,CONTENU,pad_collate_fn,TAILLE_VOCA,PAD_IX,EOS_IX
+from generate import generate_beam,generate
 from utils import *
+from modules import Embedder_RNN , LSTM
 from tqdm import tqdm
+import numpy as np
 import matplotlib.pyplot as plt
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -53,8 +53,8 @@ for epoch in tqdm(range(EPOCHS)):
         loss.backward()
         optimizer.step()
 
-        with torch.no_grad():
-                temp_loss.append(loss.item())
+        #with torch.no_grad():
+        temp_loss.append(loss.item())
 
     losses_tr.append(np.mean(temp_loss))
 

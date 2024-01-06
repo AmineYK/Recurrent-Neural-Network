@@ -1,11 +1,12 @@
 
 import torch
-import torch.nn as nn
-from torch.nn import CrossEntropyLoss
-from torch.utils.data import DataLoader
-from textloader import *
-from generate import *
+from torch.utils.data import DataLoader , Subset
+from textloader import TextDataset,CONTENU,pad_collate_fn,TAILLE_VOCA,EOS_IX,PAD_IX
+from modules import GRU , Embedder_RNN
+import numpy as np
+from generate import generate_beam,generate  
 from utils import *
+
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -13,7 +14,7 @@ import matplotlib.pyplot as plt
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< LOADING DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-TAILLE_DATASET = 1000
+TAILLE_DATASET = 16000
 ds = TextDataset(CONTENU)
 subset_indices = torch.randint(1,1000,(TAILLE_DATASET,))  # Choisissez les indices que vous souhaitez inclure
 ds = Subset(ds, subset_indices)
@@ -29,7 +30,7 @@ dim_out = TAILLE_VOCA
 gru = GRU(dim_in,dim_lat,dim_out)
 embedder_gru = Embedder_RNN(TAILLE_VOCA+1,TAILLE_VOCA,gru)
 
-'''
+
 LEARNING_RATE = 1e-1
 EPOCHS = 20
 optimizer = torch.optim.Adam(params=embedder_gru.parameters() ,lr=LEARNING_RATE)
@@ -52,19 +53,22 @@ for epoch in tqdm(range(EPOCHS)):
         loss.backward()
         optimizer.step()
 
-        with torch.no_grad():
-                temp_loss.append(loss.item())
 
-    losses_tr.append(np.mean(temp_loss))'''
+        with torch.no_grad():
+            temp_loss.append(loss.item())
+
+    losses_tr.append(np.mean(temp_loss))
 
 
 '''sentence_generated = generate(embedder_gru,EOS_IX, start="Amine", maxlen=200)
 print(sentence_generated)'''
 
-'''plt.plot(range(EPOCHS) , losses_tr)
+a = generate_beam(embedder_gru,EOS_IX,6, start="That is some group of people", maxlen=200)
+print(a)
+
+plt.plot(range(EPOCHS) , losses_tr)
 plt.title("Loss LSTM")
 plt.show()
-'''
-a = generate_beam(embedder_gru,EOS_IX,6, start="That is some group of people", maxlen=200)
 
-b = generate_beam_nucleus(embedder_gru,EOS_IX,6,alpha=0.75, start="That is some group of people", maxlen=200)
+
+#b = generate_beam_nucleus(embedder_gru,EOS_IX,6,alpha=0.75, start="That is some group of people", maxlen=200)

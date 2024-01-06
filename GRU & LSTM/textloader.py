@@ -12,6 +12,7 @@ PAD_IX = 0
 EOS_IX = 1
 
 LETTRES = string.ascii_letters + string.punctuation + string.digits + ' '
+TAILLE_VOCA = len(LETTRES) + 2 
 id2lettre = dict(zip(range(2, len(LETTRES)+2), LETTRES))
 id2lettre[PAD_IX] = '<PAD>' ##NULL CHARACTER
 id2lettre[EOS_IX] = '<EOS>'
@@ -74,9 +75,7 @@ def pad_collate_fn(samples):
             
     return tensor_padded
 
-
-PATH = "data/"
-with open(PATH+"trump_full_speech.txt") as f:
+with open("trump_full_speech.txt") as f:
     CONTENU = ""
     for ligne in f:
         CONTENU += ligne.strip()
